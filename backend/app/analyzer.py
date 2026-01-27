@@ -2,47 +2,50 @@ import os
 import google.generativeai as genai
 
 def analyze_trend(video_data_text):
-    api_key = None
-    debug_path = "Не проверялся"
-    
-    # ЧИТАЕМ ИЗ СЕКРЕТНОГО ФАЙЛА RENDER
     secret_path = '/etc/secrets/google_key'
+    file_content = "ФАЙЛ НЕ ПРОЧИТАН"
+    source = "НЕИЗВЕСТНО"
     
-    try:
-        if os.path.exists(secret_path):
-            with open(secret_path, 'r') as f:
-                # strip() удалит пробелы и переносы строк, если они случайно попали
-                api_key = f.read().strip()
-            debug_path = f"Файл найден: {secret_path}"
-        else:
-            debug_path = f"Файл НЕ найден: {secret_path}"
+    # 1. Читаем файл и сохраняем то, что видим (для отчета)
+    if os.path.exists(secret_path):
+        with open(secret_path, 'r') as f:
+            raw_content = f.read()
+            # Показываем первые 10 и последние 5 символов
+            start = raw_content[:10]
+            end = raw_content[-5:] if len(raw_content) > 5 else ""
+            file_content = f"'{start}...{end}' (Длина: {len(raw_content)})"
             
-    except Exception as e:
-        debug_path = f"Ошибка чтения файла: {str(e)}"
-
-    # Если файла нет, пробуем старый добрый GOOGLE_API_KEY как запасной вариант
-    if not api_key:
+            # Используем это как ключ
+            api_key = raw_content.strip()
+            source = f"Файл {secret_path}"
+    else:
+        # Если файла нет, проверяем переменную (на всякий случай)
         api_key = os.environ.get("GOOGLE_API_KEY")
+        source = "Переменная GOOGLE_API_KEY"
+        if api_key:
+            file_content = f"'{api_key[:10]}...'"
+        else:
+            file_content = "ПУСТО"
+
+    # 2. Формируем отчет ДО того, как упадем
+    debug_info = (
+        f"\n\n--- ЭКСПЕРТИЗА ---\n"
+        f"Источник: {source}\n"
+        f"ВИЖУ КЛЮЧ: {file_content}\n"
+        f"------------------"
+    )
 
     try:
         if not api_key:
-            raise ValueError(f"Ключ не добыт. Статус файла: {debug_path}")
+            return f"ОШИБКА: Ключ не найден нигде. {debug_info}"
 
-        # Проверка на ghp_ (чтобы ты сразу увидел, если старый ключ всё еще лезет)
         if api_key.startswith("ghp_"):
-            return f"ОШИБКА: Это ключ от GitHub (ghp_), а не от Google! Проверь файл {secret_path}."
+            return f"🚨 ВНИМАНИЕ: Сервер видит ключ GitHub! {debug_info}"
 
         genai.configure(api_key=api_key)
-        
-        # Используем gemini-pro как самую стабильную
         model = genai.GenerativeModel('gemini-pro')
-        
-        prompt = f"Analyze market strategy for: {video_data_text}. Answer in Russian. Short bullet points."
-        
-        response = model.generate_content(prompt)
+        response = model.generate_content(f"Analyze: {video_data_text}. Russian. Short.")
         return response.text
         
     except Exception as e:
-        # Показываем первые 4 символа ключа для диагностики
-        key_preview = api_key[:4] if api_key else "None"
-        return f"ОШИБКА AI: {str(e)} | Ключ: {key_preview}... | Файл: {debug_path}"
+        return f"ОШИБКА AI: {str(e)} {debug_info}"
