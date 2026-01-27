@@ -1,13 +1,4 @@
 fastapi
 uvicorn
-pandas
-pytrends
-requests
-python-multipart
-scikit-learn
 google-generativeai
 python-dotenv
-scrapetube
-beautifulsoup4
-lxml
-pydantic
