@@ -1,51 +1,23 @@
-
+import os
 import google.generativeai as genai
 
-
-
 def analyze_trend(video_data_text):
+    # Берем ключ из переменной (ты его уже прописал в 'trend-hunter', так что сработает)
+    api_key = os.environ.get("GOOGLE_API_KEY")
 
-    # --- ХАРДКОД (ВРЕМЕННО) ---
-
-    # Мы вписываем ключ прямо сюда, чтобы исключить любые ошибки сервера.
-
-    # Вставь свой ключ AIza... внутрь кавычек ниже:
-
-    api_key = "AIzaSyCW29jEFUUHLBLZz_PJgpxfwbzbRlck6R0" 
-
-    
-
-    # ПРОВЕРКА НА БЕРЕГУ
-
-    if "ghp_" in api_key:
-
-        return "СТОП! Ты случайно вставил сюда ключ от Гитхаба (ghp_)! Замени его на AIza."
-
-
+    if not api_key:
+        return "ОШИБКА: Ключ GOOGLE_API_KEY не найден."
 
     try:
-
         genai.configure(api_key=api_key)
-
         
-
-        # Берем модель gemini-pro
-
-        model = genai.GenerativeModel('gemini-pro')
-
+        # Используем новейшую модель 1.5-flash
+        model = genai.GenerativeModel('gemini-1.5-flash')
         
-
-        prompt = f"Analyze market strategy for: {video_data_text}. Answer in Russian. Short bullet points."
-
+        prompt = f"Проанализируй рыночную стратегию для следующего контента: {video_data_text}. Ответь на русском языке, кратко, тезисами."
         
-
         response = model.generate_content(prompt)
-
         return response.text
-
         
-
     except Exception as e:
-
         return f"ОШИБКА AI: {str(e)}"
-
