@@ -5,3 +5,4 @@ pytrends
 requests
 python-multipart
 scikit-learn
+google-generativeai
