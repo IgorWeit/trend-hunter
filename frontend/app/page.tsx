@@ -12,7 +12,7 @@ const TrendChart = dynamic(() => import('./TrendChart'), {
 });
 
 // ВАШ АДРЕС БЭКЕНДА
-const BACKEND_URL = 'https://trend-backend-6fsl.onrender.com';
+const BACKEND_URL = 'https://trend-hunter.onrender.com';
 
 export default function Home() {
   // --- STATE ---
