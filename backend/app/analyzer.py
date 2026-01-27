@@ -1,35 +1,28 @@
 import os
 import google.generativeai as genai
 
-# УБИРАЕМ load_dotenv(). 
-# Теперь код не будет шариться по дискам в поисках скрытых файлов.
-# from dotenv import load_dotenv
-# load_dotenv()
-
 def analyze_trend(video_data_text):
-    # Берем напрямую из переменных системы
-    api_key = os.environ.get("GEMINI_API_KEY")
-    
-    # Запасной вариант
-    if not api_key:
-        api_key = os.environ.get("GOOGLE_API_KEY")
+    # Ищем НАШУ НОВУЮ переменную. 
+    # Никаких GEMINI_API_KEY, никаких конфликтов.
+    api_key = os.environ.get("MY_SUPER_KEY")
 
-    # ДИАГНОСТИКА 2.0
+    # ДИАГНОСТИКА
     if not api_key:
-        key_debug = "КЛЮЧ НЕ НАЙДЕН (None)"
+        key_debug = "MY_SUPER_KEY НЕ НАЙДЕН (None)"
     else:
-        visible_part = api_key[:5] # Покажем 5 букв
+        visible_part = api_key[:5]
         length = len(api_key)
-        key_debug = f"Вижу ключ: '{visible_part}...' (Всего: {length} симв.)"
+        key_debug = f"Вижу MY_SUPER_KEY: '{visible_part}...' (Всего: {length} симв.)"
 
     try:
         if not api_key:
-            # Выведем список ВСЕХ доступных переменных (только названия), чтобы понять, что видит сервер
-            all_vars = ", ".join(list(os.environ.keys()))
-            raise ValueError(f"Переменная пуста. Доступные переменные: {all_vars}")
+            # Выведем список всех ключей, чтобы понять, что происходит
+            all_keys = ", ".join(list(os.environ.keys()))
+            raise ValueError(f"Переменная пуста. Доступные ключи: {all_keys}")
 
         genai.configure(api_key=api_key)
         
+        # Модель
         target_model = 'gemini-1.5-flash'
         for m in genai.list_models():
             if 'generateContent' in m.supported_generation_methods:
@@ -45,6 +38,5 @@ def analyze_trend(video_data_text):
         return response.text
         
     except Exception as e:
-        print(f"❌ DEBUG: {key_debug}")
         print(f"❌ ERROR: {str(e)}")
         return f"ОШИБКА: {str(e)} | {key_debug}"
