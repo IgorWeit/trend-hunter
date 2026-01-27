@@ -2,49 +2,47 @@ import os
 import google.generativeai as genai
 from dotenv import load_dotenv
 
-# Пытаемся загрузить .env (для локальной разработки)
 load_dotenv()
 
 def analyze_trend(video_data_text):
-    # Читаем ключ внутри функции, чтобы он подхватился даже если задан позже
+    # 1. Пытаемся найти ключ под разными именами
     api_key = os.getenv("GEMINI_API_KEY")
-
     if not api_key:
-        # Пытаемся найти альтернативные имена, вдруг ты назвал его иначе
         api_key = os.getenv("GOOGLE_API_KEY")
 
+    # 2. Формируем отчет о ключе (для отладки), скрывая сам секрет
     if not api_key:
-        # Выводим список того, что видит сервер (для отладки), но скрываем значения
-        env_vars = ", ".join([k for k in os.environ.keys()])
-        print(f"❌ ОШИБКА: Ключ не найден. Вижу такие переменные: {env_vars}")
-        return "Error: System variable 'GEMINI_API_KEY' is missing on Render. Check Environment tab."
+        key_debug = "КЛЮЧ НЕ НАЙДЕН (None)"
+    else:
+        # Показываем первые 4 символа и общую длину
+        visible_part = api_key[:4]
+        length = len(api_key)
+        key_debug = f"Ключ найден: '{visible_part}...' (Длина: {length} симв.)"
 
     try:
+        if not api_key:
+            raise ValueError("Переменная окружения пуста")
+
+        # Принудительная конфигурация
         genai.configure(api_key=api_key)
         
-        target_model_name = 'gemini-1.5-flash' # Пробуем быструю модель по умолчанию
-        
-        # Проверка доступных моделей (упрощено)
+        # Выбираем модель
+        target_model = 'gemini-1.5-flash'
         for m in genai.list_models():
             if 'generateContent' in m.supported_generation_methods:
-                if 'gemini-1.5' in m.name or 'gemini-pro' in m.name:
-                    target_model_name = m.name
+                if 'gemini-1.5' in m.name:
+                    target_model = m.name
                     break
 
-        model = genai.GenerativeModel(target_model_name)
+        model = genai.GenerativeModel(target_model)
         
-        prompt = f"""
-        Analyze this trend category: "{video_data_text}".
-        Provide a strategy in Russian:
-        1. Hook (How to start).
-        2. Visuals (What to show).
-        3. Why it goes viral.
-        Keep it concise.
-        """
+        prompt = f"Analyze market strategy for: {video_data_text}. Answer in Russian. Short bullet points."
         
         response = model.generate_content(prompt)
         return response.text
         
     except Exception as e:
-        print(f"❌ ОШИБКА AI: {str(e)}")
-        return f"AI Error: {str(e)}"
+        print(f"❌ DEBUG INFO: {key_debug}")
+        print(f"❌ ERROR: {str(e)}")
+        # Возвращаем эту инфу на фронтенд, чтобы ты увидел её в браузере
+        return f"ОШИБКА: {str(e)} | ДИАГНОСТИКА: {key_debug}"
