@@ -3,3 +3,7 @@ uvicorn
 google-generativeai
 python-dotenv
 scrapetube
+pytrends
+pandas
+requests
+lxml
