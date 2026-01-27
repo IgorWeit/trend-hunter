@@ -2,17 +2,17 @@ import os
 import google.generativeai as genai
 
 def analyze_trend(video_data_text):
-    # Берем ключ из переменной (ты его уже прописал в 'trend-hunter', так что сработает)
     api_key = os.environ.get("GOOGLE_API_KEY")
-
-    if not api_key:
-        return "ОШИБКА: Ключ GOOGLE_API_KEY не найден."
+    
+    # Если в переменной пусто, используем наш временный хардкод
+    if not api_key or api_key.startswith("ghp_"):
+        api_key = "ТВОЙ_КЛЮЧ_AIza" # Оставь здесь свой ключ, если не уверен в переменной
 
     try:
         genai.configure(api_key=api_key)
         
-        # Используем новейшую модель 1.5-flash
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        # Используем имя-синоним, оно самое надежное
+        model = genai.GenerativeModel('gemini-1.5-flash-latest')
         
         prompt = f"Проанализируй рыночную стратегию для следующего контента: {video_data_text}. Ответь на русском языке, кратко, тезисами."
         
@@ -20,4 +20,4 @@ def analyze_trend(video_data_text):
         return response.text
         
     except Exception as e:
-        return f"ОШИБКА AI: {str(e)}"
+        return f"ОШИБКА AI (Model Error): {str(e)}"
