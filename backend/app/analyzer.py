@@ -2,29 +2,34 @@ import os
 import google.generativeai as genai
 
 def analyze_trend(video_data_text):
-    # Пытаемся взять ключ
-    api_key = os.environ.get("GEMINI_API_KEY")
-
-    # СТУКАЧ: Собираем список всех переменных, которые видит сервер
-    # Мы сортируем их, чтобы тебе было легче искать глазами
-    env_keys = sorted(list(os.environ.keys()))
-    env_list_str = ", ".join(env_keys)
+    # Сервер сказал, что у него есть GOOGLE_API_KEY. Используем его.
+    api_key = os.environ.get("GOOGLE_API_KEY")
 
     try:
         if not api_key:
-            # Выводим ошибку и СПИСОК ПЕРЕМЕННЫХ
-            raise ValueError(f"КЛЮЧА НЕТ. Сервер видит только эти переменные: [{env_list_str}]")
+            raise ValueError("Ключ не найден (даже GOOGLE_API_KEY)")
 
         genai.configure(api_key=api_key)
         
-        # Подбор модели
-        target_model = 'gemini-1.5-flash'
-        # (Упрощенная логика для теста, главное - авторизация)
+        # Автопоиск рабочей модели (чтобы не было ошибки 404)
+        target_model = 'gemini-1.5-flash' # Пробуем по умолчанию
         
+        # Если API пустит, спросим список моделей
+        try:
+            for m in genai.list_models():
+                if 'generateContent' in m.supported_generation_methods:
+                    if 'gemini-1.5' in m.name:
+                        target_model = m.name
+                        break
+        except:
+            pass # Если не получилось получить список, пробуем наугад 'gemini-1.5-flash'
+
         model = genai.GenerativeModel(target_model)
-        prompt = f"Analyze: {video_data_text}. Russian. Short."
+        
+        prompt = f"Analyze market strategy for: {video_data_text}. Answer in Russian. Short bullet points."
+        
         response = model.generate_content(prompt)
         return response.text
         
     except Exception as e:
-        return f"ОШИБКА: {str(e)}"
+        return f"ОШИБКА AI: {str(e)}"
