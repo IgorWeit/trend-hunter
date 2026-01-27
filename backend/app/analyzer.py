@@ -1,32 +1,35 @@
 import os
 import google.generativeai as genai
-from dotenv import load_dotenv
 
-load_dotenv()
+# УБИРАЕМ load_dotenv(). 
+# Теперь код не будет шариться по дискам в поисках скрытых файлов.
+# from dotenv import load_dotenv
+# load_dotenv()
 
 def analyze_trend(video_data_text):
-    # 1. Пытаемся найти ключ под разными именами
-    api_key = os.getenv("GEMINI_API_KEY")
+    # Берем напрямую из переменных системы
+    api_key = os.environ.get("GEMINI_API_KEY")
+    
+    # Запасной вариант
     if not api_key:
-        api_key = os.getenv("GOOGLE_API_KEY")
+        api_key = os.environ.get("GOOGLE_API_KEY")
 
-    # 2. Формируем отчет о ключе (для отладки), скрывая сам секрет
+    # ДИАГНОСТИКА 2.0
     if not api_key:
         key_debug = "КЛЮЧ НЕ НАЙДЕН (None)"
     else:
-        # Показываем первые 4 символа и общую длину
-        visible_part = api_key[:4]
+        visible_part = api_key[:5] # Покажем 5 букв
         length = len(api_key)
-        key_debug = f"Ключ найден: '{visible_part}...' (Длина: {length} симв.)"
+        key_debug = f"Вижу ключ: '{visible_part}...' (Всего: {length} симв.)"
 
     try:
         if not api_key:
-            raise ValueError("Переменная окружения пуста")
+            # Выведем список ВСЕХ доступных переменных (только названия), чтобы понять, что видит сервер
+            all_vars = ", ".join(list(os.environ.keys()))
+            raise ValueError(f"Переменная пуста. Доступные переменные: {all_vars}")
 
-        # Принудительная конфигурация
         genai.configure(api_key=api_key)
         
-        # Выбираем модель
         target_model = 'gemini-1.5-flash'
         for m in genai.list_models():
             if 'generateContent' in m.supported_generation_methods:
@@ -42,7 +45,6 @@ def analyze_trend(video_data_text):
         return response.text
         
     except Exception as e:
-        print(f"❌ DEBUG INFO: {key_debug}")
+        print(f"❌ DEBUG: {key_debug}")
         print(f"❌ ERROR: {str(e)}")
-        # Возвращаем эту инфу на фронтенд, чтобы ты увидел её в браузере
-        return f"ОШИБКА: {str(e)} | ДИАГНОСТИКА: {key_debug}"
+        return f"ОШИБКА: {str(e)} | {key_debug}"
