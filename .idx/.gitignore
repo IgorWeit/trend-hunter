@@ -1,0 +1,12 @@
+# Игнорировать везде
+**/node_modules/
+**/.venv/
+**/venv/
+**/.next/
+**/__pycache__/
+**/*.pyc
+
+# Секреты
+.env
+.env.local
+.DS_Store
