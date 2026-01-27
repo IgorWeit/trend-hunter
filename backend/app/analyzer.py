@@ -2,29 +2,19 @@ import os
 import google.generativeai as genai
 
 def analyze_trend(video_data_text):
-    # Сервер сказал, что у него есть GOOGLE_API_KEY. Используем его.
-    api_key = os.environ.get("GOOGLE_API_KEY")
+    # Берем нашу новую чистую переменную
+    api_key = os.environ.get("FINAL_KEY")
 
     try:
         if not api_key:
-            raise ValueError("Ключ не найден (даже GOOGLE_API_KEY)")
+            raise ValueError("FINAL_KEY не найден в настройках Render")
 
         genai.configure(api_key=api_key)
         
-        # Автопоиск рабочей модели (чтобы не было ошибки 404)
-        target_model = 'gemini-1.5-flash' # Пробуем по умолчанию
-        
-        # Если API пустит, спросим список моделей
-        try:
-            for m in genai.list_models():
-                if 'generateContent' in m.supported_generation_methods:
-                    if 'gemini-1.5' in m.name:
-                        target_model = m.name
-                        break
-        except:
-            pass # Если не получилось получить список, пробуем наугад 'gemini-1.5-flash'
-
-        model = genai.GenerativeModel(target_model)
+        # ИСПОЛЬЗУЕМ СТАНДАРТНУЮ МОДЕЛЬ
+        # gemini-1.5-flash иногда недоступна на бесплатном тарифе или в v1beta
+        # gemini-pro - это "автомат Калашникова", работает везде.
+        model = genai.GenerativeModel('gemini-pro')
         
         prompt = f"Analyze market strategy for: {video_data_text}. Answer in Russian. Short bullet points."
         
