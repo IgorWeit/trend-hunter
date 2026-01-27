@@ -2,34 +2,34 @@ import os
 import google.generativeai as genai
 from dotenv import load_dotenv
 
+# Пытаемся загрузить .env (для локальной разработки)
 load_dotenv()
-api_key = os.getenv("GEMINI_API_KEY")
 
 def analyze_trend(video_data_text):
+    # Читаем ключ внутри функции, чтобы он подхватился даже если задан позже
+    api_key = os.getenv("GEMINI_API_KEY")
+
     if not api_key:
-        return "Error: API Key not found in .env"
+        # Пытаемся найти альтернативные имена, вдруг ты назвал его иначе
+        api_key = os.getenv("GOOGLE_API_KEY")
+
+    if not api_key:
+        # Выводим список того, что видит сервер (для отладки), но скрываем значения
+        env_vars = ", ".join([k for k in os.environ.keys()])
+        print(f"❌ ОШИБКА: Ключ не найден. Вижу такие переменные: {env_vars}")
+        return "Error: System variable 'GEMINI_API_KEY' is missing on Render. Check Environment tab."
 
     try:
         genai.configure(api_key=api_key)
         
-        # --- БЛОК АВТОПОИСКА МОДЕЛИ ---
-        # Мы не гадаем название, а берем первую доступную из списка
-        target_model_name = None
+        target_model_name = 'gemini-1.5-flash' # Пробуем быструю модель по умолчанию
         
-        print("🔍 Ищу доступные модели...")
+        # Проверка доступных моделей (упрощено)
         for m in genai.list_models():
-            # Ищем модели, которые умеют генерировать текст ('generateContent')
             if 'generateContent' in m.supported_generation_methods:
-                if 'gemini' in m.name:
+                if 'gemini-1.5' in m.name or 'gemini-pro' in m.name:
                     target_model_name = m.name
-                    print(f"✅ Выбрана модель: {target_model_name}")
-                    break # Берем первую найденную и выходим
-        
-        if not target_model_name:
-            # Если автопоиск не сработал, пробуем самую старую и надежную как запасной вариант
-            target_model_name = 'models/gemini-pro'
-            print("⚠️ Автопоиск не дал результатов. Пробую models/gemini-pro")
-        # ------------------------------
+                    break
 
         model = genai.GenerativeModel(target_model_name)
         
