@@ -12,7 +12,7 @@ const TrendChart = dynamic(() => import('./TrendChart'), {
 });
 
 // ВАШ АДРЕС БЭКЕНДА
-const BACKEND_URL = 'https://8000-firebase-platform-analysis-1769436880154.cluster-c72u3gwiofapkvxrcwjq5zllcu.cloudworkstations.dev';
+const BACKEND_URL = 'https://trend-backend-6fsl.onrender.com';
 
 export default function Home() {
   // --- STATE ---
