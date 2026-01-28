@@ -2,114 +2,82 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Weit - Premium Trend Intelligence</title>
+    <title>The Weit - Premium Intelligence</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
     <style>
         body { background: #F5F1E8; color: #2C2420; font-family: 'Inter', sans-serif; }
-        .stat-card { background: white; border: 2px solid #E8E3D8; border-radius: 1.5rem; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
-        .stat-card:hover { border-color: #C9A875; transform: translateY(-5px); box-shadow: 0 20px 40px rgba(201, 168, 117, 0.15); }
-        .btn-gold { background: linear-gradient(135deg, #C9A875, #B8976A); color: white; box-shadow: 0 10px 20px rgba(201, 168, 117, 0.3); }
-        .chart-wrapper { position: relative; height: 300px !important; width: 100%; }
-        .prose h3 { color: #C9A875; border-bottom: 1px solid #E8E3D8; padding-bottom: 0.5rem; margin-top: 2rem; }
-        .prose strong { color: #8B7355; }
-        .metric-desc { font-size: 0.75rem; color: #8B7355; margin-top: 0.5rem; line-height: 1.3; }
-        .line-art { position: fixed; opacity: 0.03; pointer-events: none; z-index: -1; }
+        .stat-card { background: white; border: 2px solid #E8E3D8; border-radius: 1.5rem; }
+        .btn-gold { background: linear-gradient(135deg, #C9A875, #B8976A); color: white; transition: 0.3s; }
+        .chart-container { position: relative; height: 280px; width: 100%; }
+        /* Стили для аккордеона источников */
+        .sources-toggle { border: 1px solid #E8E3D8; border-radius: 12px; margin-top: 20px; overflow: hidden; }
+        .sources-header { background: #FAF9F6; padding: 12px 20px; cursor: pointer; font-weight: bold; color: #8B7355; display: flex; justify-content: space-between; }
+        .sources-content { padding: 20px; display: none; background: white; border-top: 1px solid #E8E3D8; }
+        .sources-content a { color: #C9A875; text-decoration: underline; display: block; margin-bottom: 8px; font-size: 0.9rem; }
     </style>
 </head>
 <body class="p-6 md:p-12">
-    <svg class="line-art top-10 right-10" width="400" height="400" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" stroke="#8B7355" fill="none" stroke-width="0.5"/></svg>
-    <svg class="line-art bottom-10 left-10" width="300" height="300" viewBox="0 0 100 100"><path d="M10 90 L90 10" stroke="#8B7355" stroke-width="0.5"/></svg>
-
     <div class="max-w-6xl mx-auto">
-        <header class="flex justify-between items-center mb-16">
-            <div>
-                <h1 class="text-6xl font-black tracking-tighter italic">THE <span class="text-[#C9A875] not-italic">WEIT</span></h1>
-                <p class="text-[#8B7355] font-bold tracking-[0.3em] text-[10px] uppercase mt-2">Elite Market & Trend Analysis</p>
-            </div>
-            <button id="exportBtn" onclick="window.print()" class="hidden border-2 border-[#C9A875] text-[#C9A875] px-6 py-2 rounded-full font-bold text-xs hover:bg-[#C9A875] hover:text-white transition-all">
-                EXPORT PDF
-            </button>
+        <header class="mb-12">
+            <h1 class="text-5xl font-black italic">THE <span class="text-[#C9A875] not-italic">WEIT</span></h1>
+            <p class="text-[10px] font-bold tracking-widest text-[#8B7355] uppercase mt-1">Global Intelligence Feed • Jan 2026</p>
         </header>
 
-        <div class="bg-white p-10 rounded-[2.5rem] border-2 border-[#E8E3D8] shadow-2xl mb-12">
-            <div class="flex flex-col md:flex-row gap-6">
-                <input id="urlInput" type="text" class="flex-1 p-5 rounded-2xl bg-[#FAF9F6] border-2 border-[#E8E3D8] outline-none focus:border-[#C9A875] transition-all text-lg" placeholder="Вставьте ссылку на канал или ключевое слово...">
-                <button id="runBtn" onclick="analyze()" class="btn-gold px-12 py-5 rounded-2xl font-black text-sm uppercase tracking-widest transition-all">Run Intelligence</button>
-            </div>
-            <div id="loader" class="hidden mt-8">
-                <div class="flex justify-between text-[10px] font-bold text-[#8B7355] mb-2">
-                    <span id="loadText">SCANNING GLOBAL TRENDS...</span>
-                    <span id="loadPerc">0%</span>
-                </div>
-                <div class="w-full bg-[#E8E3D8] h-1 rounded-full overflow-hidden">
-                    <div id="loadBar" class="h-full bg-[#C9A875] transition-all duration-1000" style="width: 0%"></div>
-                </div>
+        <div class="bg-white p-8 rounded-3xl border-2 border-[#E8E3D8] shadow-xl mb-10">
+            <div class="flex flex-col md:flex-row gap-4">
+                <input id="urlInput" type="text" class="flex-1 p-5 rounded-2xl bg-[#FAF9F6] border-2 border-[#E8E3D8] outline-none focus:border-[#C9A875]" placeholder="Enter keyword or link for deep analysis...">
+                <button id="runBtn" onclick="analyze()" class="btn-gold px-12 py-5 rounded-2xl font-black uppercase tracking-widest">Run Intelligence</button>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-            <div class="stat-card p-8">
-                <p class="text-[10px] font-bold text-[#8B7355] uppercase tracking-widest mb-4">Viral Score</p>
-                <p id="mScore" class="text-6xl font-black text-[#C9A875]">—</p>
-                <p class="metric-desc">Скорость роста охвата. 8+ означает взрывной тренд, обходящий алгоритмы в 2.5 раза быстрее нормы.</p>
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+            <div class="stat-card p-6">
+                <p class="text-[10px] font-bold text-[#8B7355] uppercase">Viral Score</p>
+                <p id="vScore" class="text-5xl font-black text-[#C9A875]">—</p>
+                <p class="text-[10px] text-[#8B7355] mt-2 leading-tight">Скорость роста охвата. 8+ = в 2.5 раза выше нормы.</p>
             </div>
-            <div class="stat-card p-8">
-                <p class="text-[10px] font-bold text-[#8B7355] uppercase tracking-widest mb-4">Niche Potential</p>
-                <p id="mNiche" class="text-xl font-bold">—</p>
-                <p class="metric-desc">Определенная ИИ товарная ниша с наивысшим ROI в TikTok Shop и YouTube Shorts.</p>
+            <div class="stat-card p-6">
+                <p class="text-[10px] font-bold text-[#8B7355] uppercase">Target Niche</p>
+                <p id="vNiche" class="text-xl font-bold mt-2">—</p>
+                <p class="text-[10px] text-[#8B7355] mt-2 leading-tight">Лидирующая категория для монетизации.</p>
             </div>
-            <div class="stat-card p-8">
-                <p class="text-[10px] font-bold text-[#8B7355] uppercase tracking-widest mb-4">Engagement Rate</p>
-                <p id="mEng" class="text-5xl font-black text-[#B8976A]">—</p>
-                <p id="mBench" class="metric-desc">Сравнение с бенчмарком. Отражает реальную связь контента с аудиторией.</p>
+            <div class="stat-card p-6">
+                <p class="text-[10px] font-bold text-[#8B7355] uppercase">Engagement Rate</p>
+                <p id="vEng" class="text-5xl font-black text-[#B8976A]">—</p>
+                <p class="text-[10px] text-[#8B7355] mt-2 leading-tight">Норма в 2026: 0.40% - 5.2%.</p>
             </div>
-            <div class="stat-card p-8">
-                <p class="text-[10px] font-bold text-[#8B7355] uppercase tracking-widest mb-4">Data Pool</p>
-                <p id="mPosts" class="text-5xl font-black text-[#8B7355]">—</p>
-                <p class="metric-desc">Выборка из 50 наиболее виральных постов, послуживших базой для этого анализа.</p>
-            </div>
-        </div>
-
-        <div id="chartSection" class="hidden grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-            <div class="stat-card p-8 chart-wrapper">
-                <p class="text-xs font-bold mb-4">Динамика спроса (30 дней)</p>
-                <canvas id="chartLine"></canvas>
-            </div>
-            <div class="stat-card p-8 chart-wrapper">
-                <p class="text-xs font-bold mb-4">Структура трафика (по форматам)</p>
-                <canvas id="chartDonut"></canvas>
+            <div class="stat-card p-6">
+                <p class="text-[10px] font-bold text-[#8B7355] uppercase">Data Samples</p>
+                <p id="vPosts" class="text-5xl font-black text-[#8B7355]">—</p>
+                <p class="text-[10px] text-[#8B7355] mt-2 leading-tight">Анализ 50 постов по критерию Velocity.</p>
             </div>
         </div>
 
-        <div class="bg-white rounded-[2.5rem] border-2 border-[#E8E3D8] shadow-2xl overflow-hidden mb-20">
-            <div id="reportArea" class="p-10 md:p-16 prose prose-lg max-w-none">
-                <div class="text-center opacity-20 py-32">
-                    <p class="text-4xl font-black italic">THE WEIT</p>
-                    <p class="text-sm tracking-widest mt-2">WAITING FOR COMMAND...</p>
-                </div>
+        <div id="charts" class="hidden grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+            <div class="stat-card p-8 chart-container">
+                <p class="text-xs font-bold mb-4">Interest Dynamics (30 Days)</p>
+                <canvas id="c1"></canvas>
             </div>
+            <div class="stat-card p-8 chart-container">
+                <p class="text-xs font-bold mb-4">Content Structure</p>
+                <canvas id="c2"></canvas>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-[2.5rem] border-2 border-[#E8E3D8] shadow-2xl p-8 md:p-12 prose prose-lg max-w-none mb-20" id="reportArea">
+            <p class="text-center opacity-30 italic">Standing by for analysis...</p>
         </div>
     </div>
 
     <script>
         let charts = {};
-
         async function analyze() {
             const val = document.getElementById('urlInput').value.trim();
             if(!val) return;
-            
-            const btn = document.getElementById('runBtn');
-            const area = document.getElementById('reportArea');
-            const bar = document.getElementById('loadBar');
-            
-            btn.disabled = true;
-            document.getElementById('loader').classList.remove('hidden');
-            area.innerHTML = '<p class="text-center italic py-20">Accessing global trend databases...</p>';
-            bar.style.width = '30%';
+            const res = document.getElementById('reportArea');
+            res.innerHTML = '<div class="text-center py-20 animate-pulse text-[#C9A875] font-bold uppercase tracking-widest">Accessing Global Archives...</div>';
 
             try {
                 const response = await fetch('/analyze', {
@@ -118,70 +86,56 @@
                     body: JSON.stringify({ url: val })
                 });
                 const data = await response.json();
-                bar.style.width = '100%';
                 
-                area.innerHTML = marked.parse(data.result);
+                // Разделяем основной текст и источники
+                const parts = data.result.split('---APPLIED_MATERIAL---');
+                const mainContent = marked.parse(parts[0]);
+                const sourcesContent = parts[1] ? marked.parse(parts[1]) : 'Источники недоступны';
+
+                res.innerHTML = `
+                    <div>${mainContent}</div>
+                    <div class="sources-toggle">
+                        <div class="sources-header" onclick="toggleSources()">
+                            <span>📊 ПРИКЛАДНОЙ МАТЕРИАЛ (50 ИСТОЧНИКОВ)</span>
+                            <span id="toggleIcon">+</span>
+                        </div>
+                        <div id="sourcesBody" class="sources-content">
+                            <p class="text-xs text-[#8B7355] mb-4 italic">На основе этих видеороликов был сформирован данный анализ стратегии:</p>
+                            ${sourcesContent}
+                        </div>
+                    </div>
+                `;
                 
-                // Извлечение данных для карточек
+                // Парсинг цифр
                 const v = data.result.match(/Viral Score\s*\|\s*([\d/]+)/i);
                 const n = data.result.match(/Product Niche\s*\|\s*([^|\n]+)/i);
                 const e = data.result.match(/Engagement\s*\|\s*([\d.]+)%/i);
-                const eb = data.result.match(/Benchmark\s*\|\s*([^|\n]+)/i);
                 const p = data.result.match(/Sources\s*\|\s*(\d+)/i);
 
-                if(v) document.getElementById('mScore').innerText = v[1];
-                if(n) document.getElementById('mNiche').innerText = n[1].trim();
-                if(e) document.getElementById('mEng').innerText = e[1] + '%';
-                if(eb) document.getElementById('mBench').innerText = "Benchmark: " + eb[1].trim();
-                if(p) document.getElementById('mPosts').innerText = p[1];
+                if(v) document.getElementById('vScore').innerText = v[1];
+                if(n) document.getElementById('vNiche').innerText = n[1].trim();
+                if(e) document.getElementById('vEng').innerText = e[1] + '%';
+                if(p) document.getElementById('vPosts').innerText = p[1];
 
-                document.getElementById('chartSection').classList.remove('hidden');
-                document.getElementById('exportBtn').classList.remove('hidden');
+                document.getElementById('charts').classList.remove('hidden');
                 initCharts();
-            } catch (err) {
-                area.innerHTML = '<p class="text-red-500">Ошибка связи с сервером The Weit.</p>';
-            } finally {
-                btn.disabled = false;
-                setTimeout(() => document.getElementById('loader').classList.add('hidden'), 1000);
-            }
+            } catch (e) { res.innerHTML = 'Error communicating with The Weit API.'; }
+        }
+
+        function toggleSources() {
+            const body = document.getElementById('sourcesBody');
+            const icon = document.getElementById('toggleIcon');
+            const isOpen = body.style.display === 'block';
+            body.style.display = isOpen ? 'none' : 'block';
+            icon.innerText = isOpen ? '+' : '−';
         }
 
         function initCharts() {
             if(charts.l) charts.l.destroy();
-            if(charts.d) charts.d.destroy();
-
-            const lineCtx = document.getElementById('chartLine').getContext('2d');
-            charts.l = new Chart(lineCtx, {
+            charts.l = new Chart(document.getElementById('c1'), {
                 type: 'line',
-                data: {
-                    labels: ['Нед 1', 'Нед 2', 'Нед 3', 'Нед 4'],
-                    datasets: [{
-                        label: 'Индекс интереса (0-100)',
-                        data: [20, 45, 85, 65],
-                        borderColor: '#C9A875',
-                        backgroundColor: 'rgba(201,168,117,0.1)',
-                        fill: true,
-                        tension: 0.4
-                    }]
-                },
-                options: { 
-                    maintainAspectRatio: false, 
-                    scales: { y: { beginAtZero: true, max: 100, title: { display: true, text: 'Упоминания/Запросы' } } } 
-                }
-            });
-
-            const donutCtx = document.getElementById('chartDonut').getContext('2d');
-            charts.d = new Chart(donutCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Обзоры', 'Storytelling', 'Лайфхаки'],
-                    datasets: [{
-                        data: [50, 30, 20],
-                        backgroundColor: ['#C9A875', '#B8976A', '#E8E3D8'],
-                        borderWidth: 0
-                    }]
-                },
-                options: { maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+                data: { labels: ['W1', 'W2', 'W3', 'W4'], datasets: [{ label: 'Index', data: [12, 45, 92, 68], borderColor: '#C9A875', fill: true }] },
+                options: { maintainAspectRatio: false, scales: { y: { title: { display: true, text: 'Interest Index (0-100)' } } } }
             });
         }
     </script>
