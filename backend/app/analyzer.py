@@ -13,23 +13,21 @@ def analyze_trend(video_data_text):
 
         model = genai.GenerativeModel(selected)
         
-        # Логика в стиле FastMoss (TikTok Shop & Trend Analytics)
         prompt = f"""
-        Ты — ведущий аналитик платформы мониторинга трендов, аналогичной FastMoss.
-        Проанализируй следующие данные по контенту: 
-        {video_data_text}
+        Ты — аналитик FastMoss. Проанализируй данные: {video_data_text}
+        Ответь СТРОГО в формате Markdown таблицы с колонками:
+        | Показатель | Значение | Аналитический инсайт |
+        | :--- | :--- | :--- |
+        | Viral Score | [0-10] | Почему такая оценка? |
+        | Товарная ниша | [Название] | Какой потенциал в TikTok Shop? |
+        | Крючок (Hook) | [Тип] | На чем держится внимание? |
+        | Монетизация | [Метод] | Как на этом делают деньги? |
         
-        Подготовь отчет в формате FastMoss Analytics:
-        1. ТРЕНДОВЫЙ РЕЙТИНГ (Viral Score): Оценка потенциала виральности контента (1-10) и причины роста.
-        2. PRODUCT INSIGHTS: Какие конкретные категории товаров или ниши продвигаются? Оцени их востребованность.
-        3. CONTENT STRATEGY: Какие хуки (hooks) и визуальные приемы используют авторы для удержания внимания и конверсии?
-        4. МОНЕТИЗАЦИЯ: Как данный тренд связан с продажами (TikTok Shop, Affiliate-ссылки, трафик на лендинги)?
-        
-        Отвечай профессионально, используя терминологию e-commerce аналитики.
+        В конце добавь краткий текстовый вывод "Бизнес-вердикт".
         """
         
         response = model.generate_content(prompt)
-        return f"*(FastMoss Style Analysis | Model: {selected})*\n\n{response.text}"
+        return f"### Аналитика FastMoss\n\n{response.text}"
         
     except Exception as e:
-        return f"ОШИБКА АНАЛИЗА: {str(e)}"
+        return f"ОШИБКА: {str(e)}"
