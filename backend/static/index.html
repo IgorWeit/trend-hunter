@@ -3,78 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FastMoss Clone</title>
+    <title>FastMoss Clone Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <style>
-        .prose table { border-collapse: collapse; width: 100%; margin: 1em 0; }
-        .prose th, .prose td { border: 1px solid #334155; padding: 0.75rem; text-align: left; }
-        .prose th { background-color: #1e293b; color: #4ade80; }
-    </style>
 </head>
 <body class="bg-[#0f172a] text-white font-sans min-h-screen p-4 md:p-8">
     <div class="max-w-6xl mx-auto">
-        <h1 class="text-3xl font-black mb-8 text-green-400">FAST<span class="text-white">MOSS</span> CLONE</h1>
-        
-        <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 mb-8">
-            <div class="flex flex-col md:flex-row gap-4">
-                <input id="urlInput" type="text" class="flex-1 p-4 rounded-xl bg-slate-900 border border-slate-700 outline-none focus:border-green-500" placeholder="Вставьте ссылку на канал...">
-                <button id="runBtn" onclick="analyze()" class="bg-green-600 hover:bg-green-500 px-10 py-4 rounded-xl font-bold transition-all">RUN STRATEGY</button>
-            </div>
-            <div id="loader" class="hidden mt-6 w-full bg-slate-700 h-1.5 rounded-full overflow-hidden">
-                <div class="bg-green-500 h-full animate-pulse" style="width: 70%"></div>
+        <div class="flex flex-col md:flex-row justify-between items-center mb-10 gap-4">
+            <h1 class="text-3xl font-black text-green-400 tracking-tighter">FASTMOSS <span class="text-white">PRO</span></h1>
+            <div class="flex bg-slate-800 p-1 rounded-xl border border-slate-700">
+                <button onclick="switchTab('channel')" id="tab-channel" class="px-6 py-2 rounded-lg font-bold bg-green-600 text-white transition-all">АНАЛИЗ КАНАЛА</button>
+                <button onclick="switchTab('battle')" id="tab-battle" class="px-6 py-2 rounded-lg font-bold text-slate-400 hover:text-white transition-all">БИТВА ТРЕНДОВ</button>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
-                <p class="text-slate-400 text-xs font-bold uppercase mb-2">Viral Score Index</p>
-                <p id="viralScore" class="text-6xl font-black text-green-400">—</p>
-            </div>
-            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
-                <p class="text-slate-400 text-xs font-bold uppercase mb-2">Dominant Category</p>
-                <p id="hotCategory" class="text-2xl font-bold">—</p>
+        <div id="section-channel" class="space-y-8">
+            <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700">
+                <div class="flex flex-col md:flex-row gap-4">
+                    <input id="urlInput" type="text" class="flex-1 p-4 rounded-xl bg-slate-900 border border-slate-700 outline-none focus:border-green-500" placeholder="Ссылка на TikTok или YouTube Shorts канал...">
+                    <button onclick="analyze('channel')" class="btn-run bg-green-600 hover:bg-green-500 px-10 py-4 rounded-xl font-bold transition-all">АНАЛИЗИРОВАТЬ</button>
+                </div>
             </div>
         </div>
 
-        <div class="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden">
-            <div class="p-6 md:p-8 prose prose-invert max-w-none" id="resultArea">
-                <p class="text-slate-500 text-center">Результаты появятся здесь...</p>
+        <div id="section-battle" class="hidden space-y-8">
+            <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <input id="trend1" type="text" class="p-4 rounded-xl bg-slate-900 border border-slate-700 outline-none focus:border-blue-500" placeholder="Первый запрос (напр. Спортивные шорты)">
+                    <input id="trend2" type="text" class="p-4 rounded-xl bg-slate-900 border border-slate-700 outline-none focus:border-red-500" placeholder="Второй запрос (напр. Легинсы для фитнеса)">
+                </div>
+                <button onclick="analyze('battle')" class="btn-run w-full bg-blue-600 hover:bg-blue-500 py-4 rounded-xl font-bold transition-all uppercase">Запустить Битву Трендов</button>
+            </div>
+        </div>
+
+        <div id="loader" class="hidden my-8 w-full bg-slate-700 h-1.5 rounded-full overflow-hidden">
+            <div class="bg-green-500 h-full animate-pulse" style="width: 60%"></div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl">
+                <p class="text-slate-400 text-xs font-bold uppercase mb-2">Viral Score</p>
+                <p id="viralScore" class="text-5xl font-black text-green-400">—</p>
+            </div>
+            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl">
+                <p class="text-slate-400 text-xs font-bold uppercase mb-2">Hot Category</p>
+                <p id="hotCategory" class="text-xl font-bold text-white leading-tight">—</p>
+            </div>
+            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow-xl">
+                <p class="text-slate-400 text-xs font-bold uppercase mb-2">Platform Focus</p>
+                <p id="platformFocus" class="text-xl font-bold text-blue-400">TikTok + YouTube</p>
+            </div>
+        </div>
+
+        <div class="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden shadow-2xl">
+            <div id="resultArea" class="p-6 md:p-10 prose prose-invert max-w-none">
+                <p class="text-slate-500 text-center">Система готова к поиску трендов...</p>
             </div>
         </div>
     </div>
 
     <script>
-        async function analyze() {
-            const url = document.getElementById('urlInput').value;
-            const btn = document.getElementById('runBtn');
+        function switchTab(tab) {
+            document.getElementById('section-channel').classList.toggle('hidden', tab !== 'channel');
+            document.getElementById('section-battle').classList.toggle('hidden', tab !== 'battle');
+            document.getElementById('tab-channel').className = tab === 'channel' ? 'px-6 py-2 rounded-lg font-bold bg-green-600 text-white' : 'px-6 py-2 rounded-lg font-bold text-slate-400';
+            document.getElementById('tab-battle').className = tab === 'battle' ? 'px-6 py-2 rounded-lg font-bold bg-blue-600 text-white' : 'px-6 py-2 rounded-lg font-bold text-slate-400';
+        }
+
+        async function analyze(type) {
             const loader = document.getElementById('loader');
-            
-            btn.disabled = true;
+            const resultArea = document.getElementById('resultArea');
             loader.classList.remove('hidden');
-            
+            resultArea.innerHTML = '<p class="text-center animate-bounce">Сбор данных из TikTok и YouTube...</p>';
+
+            let payload = {};
+            if(type === 'channel') {
+                payload = { type: 'channel', url: document.getElementById('urlInput').value };
+            } else {
+                payload = { type: 'battle', query1: document.getElementById('trend1').value, query2: document.getElementById('trend2').value };
+            }
+
             try {
                 const response = await fetch('/analyze', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ url })
+                    body: JSON.stringify(payload)
                 });
                 const data = await response.json();
+                resultArea.innerHTML = marked.parse(data.result);
                 
-                // Рендерим Markdown таблицу
-                document.getElementById('resultArea').innerHTML = marked.parse(data.result);
-                
-                // Вытаскиваем данные для карточек
                 const vScore = data.result.match(/Viral Score\s*\|\s*([\d/]+)/);
                 const hCat = data.result.match(/Товарная ниша\s*\|\s*([^|]+)/);
-                
                 if(vScore) document.getElementById('viralScore').innerText = vScore[1];
                 if(hCat) document.getElementById('hotCategory').innerText = hCat[1].trim();
-                
             } catch (e) {
-                alert('Ошибка анализа');
+                resultArea.innerHTML = '<p class="text-red-500">Ошибка соединения с сервером.</p>';
             } finally {
-                btn.disabled = false;
                 loader.classList.add('hidden');
             }
         }
