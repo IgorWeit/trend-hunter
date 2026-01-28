@@ -7,18 +7,24 @@ import os
 
 app = FastAPI()
 
-# Подключаем статику
-if os.path.exists("static"):
-    app.mount("/static", StaticFiles(directory="static"), name="static")
-
-class AnalyzeRequest(BaseModel):
-    url: str
+# Определяем абсолютный путь к папке static
+current_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+static_path = os.path.join(current_dir, "static")
 
 @app.post("/analyze")
-async def analyze(request: AnalyzeRequest):
-    result = analyze_trend(request.url)
+async def analyze(request: BaseModel):
+    # Универсальный прием данных
+    url = getattr(request, 'url', None)
+    result = analyze_trend(url)
     return {"result": result}
 
 @app.get("/")
 async def read_index():
-    return FileResponse("static/index.html")
+    index_file = os.path.join(static_path, "index.html")
+    if os.path.exists(index_file):
+        return FileResponse(index_file)
+    return {"error": f"Index file not found at {index_file}"}
+
+# Монтируем статику в конце
+if os.path.exists(static_path):
+    app.mount("/static", StaticFiles(directory=static_path), name="static")
