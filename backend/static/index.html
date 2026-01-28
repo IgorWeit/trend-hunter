@@ -535,7 +535,7 @@
 
             <!-- Engagement Chart -->
 
-            <div class="bg-white p-6 rounded-2xl shadow-lg" style="border: 2px solid #E8E3D8;">
+            <div class="bg-white p-6 rounded-2xl shadow-lg" style="border: 2px solid #E8E3D8; max-height: 400px; overflow: hidden;">
 
                 <h3 class="text-lg font-bold mb-4 flex items-center gap-2" style="color: #2C2420;">
 
@@ -549,7 +549,7 @@
 
                 </h3>
 
-                <canvas id="engagementChart" height="200"></canvas>
+                <canvas id="engagementChart" height="200" style="max-height: 300px;"></canvas>/canvas>
 
             </div>
 
@@ -557,7 +557,7 @@
 
             <!-- Category Distribution -->
 
-            <div class="bg-white p-6 rounded-2xl shadow-lg" style="border: 2px solid #E8E3D8;">
+            <div class="bg-white p-6 rounded-2xl shadow-lg" style="border: 2px solid #E8E3D8; max-height: 400px; overflow: hidden;">
 
                 <h3 class="text-lg font-bold mb-4 flex items-center gap-2" style="color: #2C2420;">
 
@@ -573,7 +573,7 @@
 
                 </h3>
 
-                <canvas id="categoryChart" height="200"></canvas>
+                <canvas id="categoryChart" height="200" style="max-height: 300px;"></canvas>/canvas>
 
             </div>
 
@@ -793,7 +793,7 @@
 
                     responsive: true,
 
-                    maintainAspectRatio: false,
+                    maintainAspectRatio: false, animation: { duration: 1000 },
 
                     plugins: {
 
@@ -877,7 +877,7 @@
 
                     responsive: true,
 
-                    maintainAspectRatio: false,
+                    maintainAspectRatio: false, animation: { duration: 1000 },
 
                     plugins: {
 
