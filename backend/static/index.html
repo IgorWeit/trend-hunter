@@ -1,133 +1,1339 @@
-<!DOCTYPE html>
+
+[<!DOCTYPE html>
+
 <html lang="ru">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FastMoss Clone - AI Trend Hunter</title>
+
+    <title>The Weit - Premium Trend Analysis</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+
     <style>
-        @keyframes countUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes shimmer { 0% { background-position: -1000px 0; } 100% { background-position: 1000px 0; } }
-        .animate-count-up { animation: countUp 0.6s ease-out forwards; }
-        .skeleton { background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%); background-size: 1000px 100%; animation: shimmer 2s infinite; }
-        .prose table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.9rem; }
-        .prose th, .prose td { border: 1px solid #334155; padding: 0.75rem; text-align: left; }
-        .prose th { background-color: #1e293b; color: #4ade80; font-weight: 700; }
-        .stat-card { position: relative; overflow: hidden; }
-        .stat-card:hover::before { left: 100%; }
-        .pulse-dot { animation: pulse 2s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-        .progress-bar { transition: width 0.3s ease; }
-    </style>
-</head>
-<body class="bg-[#0f172a] text-white font-sans min-h-screen p-4 md:p-8">
-    <div class="max-w-7xl mx-auto">
-        <div class="flex items-center justify-between mb-8">
-            <h1 class="text-4xl font-black text-green-400">FAST<span class="text-white">MOSS</span> <span class="text-xs text-slate-500 font-normal uppercase tracking-widest">Analytics Tool</span></h1>
-            <button id="exportBtn" onclick="exportReport()" class="hidden bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2">
-                📥 Скачать отчет
-            </button>
-        </div>
+
+        * {
+
+            font-family: 'Inter', 'Helvetica', sans-serif;
+
+        }
+
         
-        <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700 mb-8 backdrop-blur-sm">
+
+        body {
+
+            background: #F5F1E8;
+
+            background-image: 
+
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(201, 168, 117, 0.03) 2px, rgba(201, 168, 117, 0.03) 4px),
+
+                repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(201, 168, 117, 0.03) 2px, rgba(201, 168, 117, 0.03) 4px);
+
+        }
+
+        
+
+        @keyframes countUp {
+
+            from { opacity: 0; transform: translateY(20px); }
+
+            to { opacity: 1; transform: translateY(0); }
+
+        }
+
+        
+
+        @keyframes shimmer {
+
+            0% { background-position: -1000px 0; }
+
+            100% { background-position: 1000px 0; }
+
+        }
+
+        
+
+        @keyframes float {
+
+            0%, 100% { transform: translateY(0px); }
+
+            50% { transform: translateY(-10px); }
+
+        }
+
+        
+
+        .animate-count-up {
+
+            animation: countUp 0.6s ease-out forwards;
+
+        }
+
+        
+
+        .skeleton {
+
+            background: linear-gradient(90deg, #E8E3D8 25%, #F5F1E8 50%, #E8E3D8 75%);
+
+            background-size: 1000px 100%;
+
+            animation: shimmer 2s infinite;
+
+        }
+
+        
+
+        .prose table { 
+
+            border-collapse: collapse; 
+
+            width: 100%; 
+
+            margin: 1.5em 0; 
+
+            font-size: 0.95rem;
+
+            background: white;
+
+            border-radius: 8px;
+
+            overflow: hidden;
+
+        }
+
+        .prose th, .prose td { 
+
+            border: 1px solid #E8E3D8; 
+
+            padding: 1rem; 
+
+            text-align: left; 
+
+        }
+
+        .prose th { 
+
+            background: linear-gradient(135deg, #C9A875, #B8976A);
+
+            color: white;
+
+            font-weight: 700;
+
+            text-transform: uppercase;
+
+            font-size: 0.85rem;
+
+            letter-spacing: 0.5px;
+
+        }
+
+        .prose tr:hover {
+
+            background-color: #FAF7F0;
+
+        }
+
+        .prose td {
+
+            color: #4A423C;
+
+        }
+
+        
+
+        .stat-card {
+
+            position: relative;
+
+            overflow: hidden;
+
+            background: white;
+
+            transition: all 300ms ease;
+
+        }
+
+        
+
+        .stat-card::before {
+
+            content: '';
+
+            position: absolute;
+
+            top: 0;
+
+            left: -100%;
+
+            width: 100%;
+
+            height: 100%;
+
+            background: linear-gradient(90deg, transparent, rgba(201, 168, 117, 0.1), transparent);
+
+            transition: left 0.5s;
+
+        }
+
+        
+
+        .stat-card:hover {
+
+            transform: translateY(-4px);
+
+            box-shadow: 0 10px 30px rgba(201, 168, 117, 0.25);
+
+        }
+
+        
+
+        .stat-card:hover::before {
+
+            left: 100%;
+
+        }
+
+        
+
+        .pulse-dot {
+
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+
+        }
+
+        
+
+        @keyframes pulse {
+
+            0%, 100% { opacity: 1; }
+
+            50% { opacity: 0.5; }
+
+        }
+
+        
+
+        .progress-bar {
+
+            transition: width 0.3s ease;
+
+        }
+
+        
+
+        .post-preview {
+
+            transition: all 0.3s ease;
+
+            background: white;
+
+        }
+
+        
+
+        .post-preview:hover {
+
+            transform: translateY(-4px);
+
+            box-shadow: 0 10px 30px rgba(201, 168, 117, 0.2);
+
+        }
+
+        
+
+        .btn-primary {
+
+            background: linear-gradient(135deg, #C9A875, #B8976A);
+
+            transition: all 300ms ease;
+
+        }
+
+        
+
+        .btn-primary:hover {
+
+            transform: translateY(-2px);
+
+            box-shadow: 0 8px 20px rgba(201, 168, 117, 0.4);
+
+        }
+
+        
+
+        .line-art {
+
+            position: absolute;
+
+            opacity: 0.05;
+
+            pointer-events: none;
+
+        }
+
+        
+
+        /* Кастомные цвета для Tailwind */
+
+        .text-primary { color: #C9A875; }
+
+        .text-secondary { color: #4A423C; }
+
+        .border-primary { border-color: #C9A875; }
+
+        .bg-primary { background-color: #C9A875; }
+
+    </style>
+
+</head>
+
+<body class="min-h-screen p-4 md:p-8">
+
+    <!-- Line Art Background -->
+
+    <svg class="line-art" width="300" height="300" style="top: 10%; right: 5%;" viewBox="0 0 200 200" fill="none" stroke="#8B7355" stroke-width="1.5">
+
+        <rect x="20" y="40" width="60" height="80" />
+
+        <rect x="90" y="30" width="50" height="90" />
+
+        <rect x="150" y="50" width="30" height="70" />
+
+        <path d="M 20 40 L 100 10 L 180 40" />
+
+        <circle cx="60" cy="160" r="15" />
+
+        <circle cx="120" cy="160" r="15" />
+
+    </svg>
+
+    
+
+    <svg class="line-art" width="250" height="250" style="bottom: 10%; left: 5%;" viewBox="0 0 200 200" fill="none" stroke="#8B7355" stroke-width="1.5">
+
+        <path d="M 20 100 L 50 80 L 80 100 L 110 70 L 140 90 L 170 60" />
+
+        <rect x="30" y="130" width="140" height="50" />
+
+        <path d="M 50 130 L 50 180 M 100 130 L 100 180 M 150 130 L 150 180" />
+
+    </svg>
+
+
+
+    <div class="max-w-7xl mx-auto">
+
+        <!-- Header -->
+
+        <div class="flex items-center justify-between mb-8">
+
+            <div>
+
+                <h1 class="text-4xl font-black mb-2" style="color: #2C2420;">
+
+                    THE <span style="color: #C9A875;">WEIT</span>
+
+                </h1>
+
+                <p class="text-sm" style="color: #8B7355;">Premium Trend Analysis Platform</p>
+
+            </div>
+
+            <button id="exportBtn" onclick="exportReport()" class="hidden bg-white px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 border-2 border-primary" style="color: #C9A875;">
+
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+
+                </svg>
+
+                Export Report
+
+            </button>
+
+        </div>
+
+        
+
+        <!-- Input Section -->
+
+        <div class="bg-white p-6 rounded-2xl mb-8 shadow-lg" style="border: 2px solid #E8E3D8;">
+
             <div class="flex flex-col md:flex-row gap-4">
-                <input id="urlInput" type="text" class="flex-1 p-4 rounded-xl bg-slate-900 border border-slate-700 outline-none focus:border-green-500 transition-all" placeholder="🔗 Вставьте ссылку или ключевое слово...">
-                <button id="runBtn" onclick="analyze()" class="bg-green-600 hover:bg-green-500 px-10 py-4 rounded-xl font-bold transition-all shadow-lg">▶ RUN ANALYSIS</button>
+
+                <input id="urlInput" type="text" class="flex-1 p-4 rounded-xl bg-white outline-none transition-all" style="border: 2px solid #E8E3D8; color: #2C2420;" placeholder="🔗 Enter Telegram channel URL...">
+
+                <button id="runBtn" onclick="analyze()" class="btn-primary px-10 py-4 rounded-xl font-bold text-white">
+
+                    ▶ RUN ANALYSIS
+
+                </button>
+
             </div>
+
             
-            <div id="aiStatus" class="hidden mt-6 flex items-center gap-3 text-sm text-slate-400">
-                <div class="flex gap-1"><div class="w-2 h-2 bg-green-400 rounded-full pulse-dot"></div><div class="w-2 h-2 bg-green-400 rounded-full pulse-dot"></div></div>
-                <span id="statusText">Инициализация...</span>
+
+            <!-- AI Status Indicator -->
+
+            <div id="aiStatus" class="hidden mt-6 flex items-center gap-3 text-sm" style="color: #8B7355;">
+
+                <div class="flex gap-1">
+
+                    <div class="w-2 h-2 rounded-full pulse-dot" style="background: #C9A875;"></div>
+
+                    <div class="w-2 h-2 rounded-full pulse-dot" style="background: #C9A875; animation-delay: 0.2s;"></div>
+
+                    <div class="w-2 h-2 rounded-full pulse-dot" style="background: #C9A875; animation-delay: 0.4s;"></div>
+
+                </div>
+
+                <span id="statusText">Initializing analysis...</span>
+
             </div>
+
             
+
+            <!-- Progress Bar -->
+
             <div id="progressContainer" class="hidden mt-4">
-                <div class="flex justify-between text-xs text-slate-400 mb-2"><span id="progressLabel">Сбор данных...</span><span id="progressPercent">0%</span></div>
-                <div class="w-full bg-slate-700 h-2 rounded-full overflow-hidden"><div id="progressBar" class="progress-bar bg-gradient-to-r from-green-600 to-green-400 h-full" style="width: 0%"></div></div>
+
+                <div class="flex justify-between text-xs mb-2" style="color: #8B7355;">
+
+                    <span id="progressLabel">Parsing posts...</span>
+
+                    <span id="progressPercent">0%</span>
+
+                </div>
+
+                <div class="w-full h-2 rounded-full overflow-hidden" style="background: #E8E3D8;">
+
+                    <div id="progressBar" class="progress-bar h-full" style="background: linear-gradient(90deg, #C9A875, #B8976A); width: 0%;"></div>
+
+                </div>
+
             </div>
+
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            <div class="stat-card bg-slate-800 p-6 rounded-2xl border border-slate-700"><p class="text-slate-400 text-xs font-bold uppercase mb-2">Viral Score</p><p id="viralScore" class="text-5xl font-black text-green-400">—</p></div>
-            <div class="stat-card bg-slate-800 p-6 rounded-2xl border border-slate-700"><p class="text-slate-400 text-xs font-bold uppercase mb-2">Ниша</p><p id="hotCategory" class="text-xl font-bold">—</p></div>
-            <div class="stat-card bg-slate-800 p-6 rounded-2xl border border-slate-700"><p class="text-slate-400 text-xs font-bold uppercase mb-2">Вовлеченность</p><p id="engagement" class="text-5xl font-black text-blue-400">—</p></div>
-            <div class="stat-card bg-slate-800 p-6 rounded-2xl border border-slate-700"><p class="text-slate-400 text-xs font-bold uppercase mb-2">Анализ постов</p><p id="postsCount" class="text-5xl font-black text-purple-400">—</p></div>
+
+
+        <!-- Stats Cards Grid -->
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8" id="statsGrid">
+
+            <!-- Viral Score -->
+
+            <div class="stat-card p-6 rounded-2xl shadow-lg" style="border: 2px solid #C9A875;">
+
+                <p class="text-xs font-bold uppercase mb-2 flex items-center gap-2" style="color: #8B7355;">
+
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+
+                    </svg>
+
+                    Viral Score
+
+                </p>
+
+                <p id="viralScore" class="text-5xl font-black" style="color: #C9A875;">—</p>
+
+                <p id="viralTrend" class="text-xs mt-2" style="color: #8B7355;"></p>
+
+            </div>
+
+            
+
+            <!-- Category -->
+
+            <div class="stat-card p-6 rounded-2xl shadow-lg" style="border: 2px solid #E8E3D8;">
+
+                <p class="text-xs font-bold uppercase mb-2 flex items-center gap-2" style="color: #8B7355;">
+
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+
+                    </svg>
+
+                    Product Niche
+
+                </p>
+
+                <p id="hotCategory" class="text-xl font-bold" style="color: #2C2420;">—</p>
+
+            </div>
+
+            
+
+            <!-- Engagement Rate -->
+
+            <div class="stat-card p-6 rounded-2xl shadow-lg" style="border: 2px solid #E8E3D8;">
+
+                <p class="text-xs font-bold uppercase mb-2 flex items-center gap-2" style="color: #8B7355;">
+
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+
+                    </svg>
+
+                    Engagement
+
+                </p>
+
+                <p id="engagement" class="text-5xl font-black" style="color: #B8976A;">—</p>
+
+                <p id="engagementChange" class="text-xs mt-2" style="color: #8B7355;"></p>
+
+            </div>
+
+            
+
+            <!-- Posts Analyzed -->
+
+            <div class="stat-card p-6 rounded-2xl shadow-lg" style="border: 2px solid #E8E3D8;">
+
+                <p class="text-xs font-bold uppercase mb-2 flex items-center gap-2" style="color: #8B7355;">
+
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+
+                    </svg>
+
+                    Posts Analyzed
+
+                </p>
+
+                <p id="postsCount" class="text-5xl font-black" style="color: #8B7355;">—</p>
+
+            </div>
+
         </div>
 
-        <div id="chartsSection" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8" style="display: none;">
-            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700"><canvas id="engagementChart" height="200"></canvas></div>
-            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700"><canvas id="categoryChart" height="200"></canvas></div>
+
+
+        <!-- Charts Section -->
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8" id="chartsSection" style="display: none;">
+
+            <!-- Engagement Chart -->
+
+            <div class="bg-white p-6 rounded-2xl shadow-lg" style="border: 2px solid #E8E3D8;">
+
+                <h3 class="text-lg font-bold mb-4 flex items-center gap-2" style="color: #2C2420;">
+
+                    <svg class="w-5 h-5" fill="none" stroke="#C9A875" viewBox="0 0 24 24" stroke-width="1.5">
+
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+
+                    </svg>
+
+                    Engagement Dynamics
+
+                </h3>
+
+                <canvas id="engagementChart" height="200"></canvas>
+
+            </div>
+
+            
+
+            <!-- Category Distribution -->
+
+            <div class="bg-white p-6 rounded-2xl shadow-lg" style="border: 2px solid #E8E3D8;">
+
+                <h3 class="text-lg font-bold mb-4 flex items-center gap-2" style="color: #2C2420;">
+
+                    <svg class="w-5 h-5" fill="none" stroke="#C9A875" viewBox="0 0 24 24" stroke-width="1.5">
+
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path>
+
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path>
+
+                    </svg>
+
+                    Category Distribution
+
+                </h3>
+
+                <canvas id="categoryChart" height="200"></canvas>
+
+            </div>
+
         </div>
 
-        <div class="bg-slate-800 rounded-2xl border border-slate-700 overflow-hidden shadow-xl">
-            <div class="p-6 md:p-8 prose prose-invert max-w-none" id="resultArea"><p class="text-slate-500 text-center py-12">Результаты появятся здесь...</p></div>
+
+
+        <!-- Top Posts Preview -->
+
+        <div id="topPostsSection" class="hidden mb-8">
+
+            <h3 class="text-2xl font-bold mb-4 flex items-center gap-2" style="color: #2C2420;">
+
+                <svg class="w-6 h-6" fill="none" stroke="#C9A875" viewBox="0 0 24 24" stroke-width="1.5">
+
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+
+                </svg>
+
+                Top 3 Viral Posts
+
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="topPostsGrid">
+
+                <!-- Динамически заполняется -->
+
+            </div>
+
         </div>
+
+
+
+        <!-- Main Results -->
+
+        <div class="bg-white rounded-2xl overflow-hidden shadow-xl" style="border: 2px solid #E8E3D8;">
+
+            <div class="px-6 py-4" style="background: linear-gradient(135deg, #FAF7F0, #F5F1E8); border-bottom: 2px solid #E8E3D8;">
+
+                <h3 class="text-lg font-bold flex items-center gap-2" style="color: #2C2420;">
+
+                    <svg class="w-5 h-5" fill="none" stroke="#C9A875" viewBox="0 0 24 24" stroke-width="1.5">
+
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+
+                    </svg>
+
+                    Detailed Analysis
+
+                </h3>
+
+            </div>
+
+            <div class="p-6 md:p-8 prose prose-lg max-w-none" id="resultArea">
+
+                <div class="text-center py-12">
+
+                    <svg class="w-16 h-16 mx-auto mb-4" fill="none" stroke="#C9A875" viewBox="0 0 24 24" stroke-width="1.5">
+
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+
+                    </svg>
+
+                    <p style="color: #8B7355;">Enter channel URL and click RUN ANALYSIS</p>
+
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
 
+
+
     <script>
-        let engagementChart = null; let categoryChart = null;
+
+        let engagementChart = null;
+
+        let categoryChart = null;
+
+        
+
+        // Simulate progress with realistic stages
+
         function simulateProgress() {
+
             const stages = [
-                { text: 'Парсинг данных TikTok/YouTube...', p: 35, d: 2000 },
-                { text: 'Анализ трендов через AI...', p: 75, d: 2500 },
-                { text: 'Генерация отчета...', p: 100, d: 1000 }
+
+                { text: 'Connecting to Telegram API...', progress: 15, duration: 1000 },
+
+                { text: 'Parsing last 50 posts...', progress: 35, duration: 2000 },
+
+                { text: 'Analyzing sentiment...', progress: 55, duration: 1500 },
+
+                { text: 'GPT analyzing content...', progress: 75, duration: 2500 },
+
+                { text: 'Generating recommendations...', progress: 90, duration: 1500 },
+
+                { text: 'Finalizing analysis...', progress: 100, duration: 800 }
+
             ];
-            let i = 0;
-            function update() {
-                if (i < stages.length) {
-                    document.getElementById('statusText').textContent = stages[i].text;
-                    document.getElementById('progressBar').style.width = stages[i].p + '%';
-                    document.getElementById('progressPercent').textContent = stages[i].p + '%';
-                    setTimeout(update, stages[i++].d);
+
+            
+
+            let currentStage = 0;
+
+            
+
+            function updateStage() {
+
+                if (currentStage < stages.length) {
+
+                    const stage = stages[currentStage];
+
+                    document.getElementById('statusText').textContent = stage.text;
+
+                    document.getElementById('progressBar').style.width = stage.progress + '%';
+
+                    document.getElementById('progressPercent').textContent = stage.progress + '%';
+
+                    document.getElementById('progressLabel').textContent = stage.text;
+
+                    
+
+                    currentStage++;
+
+                    setTimeout(updateStage, stage.duration);
+
                 }
+
             }
-            update();
+
+            
+
+            updateStage();
+
         }
+
+        
+
+        // Animate number counting
+
+        function animateValue(element, start, end, duration) {
+
+            let startTimestamp = null;
+
+            const step = (timestamp) => {
+
+                if (!startTimestamp) startTimestamp = timestamp;
+
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+
+                const value = Math.floor(progress * (end - start) + start);
+
+                element.textContent = value;
+
+                if (progress < 1) {
+
+                    window.requestAnimationFrame(step);
+
+                } else {
+
+                    element.textContent = end;
+
+                }
+
+            };
+
+            window.requestAnimationFrame(step);
+
+        }
+
+        
+
+        // Create engagement chart
+
+        function createEngagementChart(data) {
+
+            const ctx = document.getElementById('engagementChart').getContext('2d');
+
+            
+
+            if (engagementChart) engagementChart.destroy();
+
+            
+
+            engagementChart = new Chart(ctx, {
+
+                type: 'line',
+
+                data: {
+
+                    labels: data.labels || ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+
+                    datasets: [{
+
+                        label: 'Engagement %',
+
+                        data: data.values || [65, 72, 68, 85, 90, 78, 88],
+
+                        borderColor: '#C9A875',
+
+                        backgroundColor: 'rgba(201, 168, 117, 0.1)',
+
+                        tension: 0.4,
+
+                        fill: true,
+
+                        borderWidth: 2
+
+                    }]
+
+                },
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    plugins: {
+
+                        legend: { display: false }
+
+                    },
+
+                    scales: {
+
+                        y: {
+
+                            beginAtZero: true,
+
+                            grid: { color: '#E8E3D8' },
+
+                            ticks: { color: '#4A423C' }
+
+                        },
+
+                        x: {
+
+                            grid: { color: '#E8E3D8' },
+
+                            ticks: { color: '#4A423C' }
+
+                        }
+
+                    }
+
+                }
+
+            });
+
+        }
+
+        
+
+        // Create category chart
+
+        function createCategoryChart(data) {
+
+            const ctx = document.getElementById('categoryChart').getContext('2d');
+
+            
+
+            if (categoryChart) categoryChart.destroy();
+
+            
+
+            categoryChart = new Chart(ctx, {
+
+                type: 'doughnut',
+
+                data: {
+
+                    labels: data.labels || ['Technology', 'Business', 'Entertainment', 'Other'],
+
+                    datasets: [{
+
+                        data: data.values || [40, 30, 20, 10],
+
+                        backgroundColor: [
+
+                            '#C9A875',
+
+                            '#B8976A',
+
+                            '#8B7355',
+
+                            '#E8E3D8'
+
+                        ],
+
+                        borderWidth: 0
+
+                    }]
+
+                },
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+                    plugins: {
+
+                        legend: {
+
+                            position: 'bottom',
+
+                            labels: { color: '#4A423C', padding: 15 }
+
+                        }
+
+                    }
+
+                }
+
+            });
+
+        }
+
+        
+
+        // Create top posts preview
+
+        function createTopPosts(posts) {
+
+            const grid = document.getElementById('topPostsGrid');
+
+            grid.innerHTML = posts.map((post, idx) => `
+
+                <div class="post-preview p-4 rounded-xl" style="border: 2px solid #E8E3D8;">
+
+                    <div class="flex items-start justify-between mb-3">
+
+                        <span class="text-2xl font-black" style="color: #C9A875;">#${idx + 1}</span>
+
+                        <span class="text-xs px-2 py-1 rounded" style="background: #FAF7F0; color: #8B7355;">${post.date || 'Yesterday'}</span>
+
+                    </div>
+
+                    <p class="text-sm mb-3 line-clamp-3" style="color: #4A423C;">${post.text || 'Post preview...'}</p>
+
+                    <div class="flex items-center gap-4 text-xs" style="color: #8B7355;">
+
+                        <span class="flex items-center gap-1">
+
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+
+                                <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z"></path>
+
+                            </svg>
+
+                            ${post.likes || '1.2K'}
+
+                        </span>
+
+                        <span class="flex items-center gap-1">
+
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+
+                                <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"></path>
+
+                            </svg>
+
+                            ${post.comments || '340'}
+
+                        </span>
+
+                        <span class="flex items-center gap-1">
+
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+
+                                <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z"></path>
+
+                            </svg>
+
+                            ${post.shares || '89'}
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+            `).join('');
+
+            
+
+            document.getElementById('topPostsSection').classList.remove('hidden');
+
+        }
+
+        
 
         async function analyze() {
+
             const url = document.getElementById('urlInput').value.trim();
-            if (!url) return alert('Введите ссылку');
+
+            
+
+            if (!url) {
+
+                alert('⚠️ Enter channel URL');
+
+                return;
+
+            }
+
+            
+
             const btn = document.getElementById('runBtn');
+
+            const aiStatus = document.getElementById('aiStatus');
+
+            const progressContainer = document.getElementById('progressContainer');
+
+            const resultArea = document.getElementById('resultArea');
+
+            
+
+            // Reset UI
+
             btn.disabled = true;
-            document.getElementById('aiStatus').classList.remove('hidden');
-            document.getElementById('progressContainer').classList.remove('hidden');
+
+            btn.innerHTML = '<span class="animate-pulse">⏳ Analyzing...</span>';
+
+            aiStatus.classList.remove('hidden');
+
+            progressContainer.classList.remove('hidden');
+
+            document.getElementById('exportBtn').classList.add('hidden');
+
+            document.getElementById('chartsSection').style.display = 'none';
+
+            document.getElementById('topPostsSection').classList.add('hidden');
+
+            
+
+            // Reset stats
+
+            document.getElementById('viralScore').textContent = '—';
+
+            document.getElementById('hotCategory').textContent = '—';
+
+            document.getElementById('engagement').textContent = '—';
+
+            document.getElementById('postsCount').textContent = '—';
+
+            
+
+            resultArea.innerHTML = `
+
+                <div class="space-y-4">
+
+                    <div class="skeleton h-4 rounded w-3/4"></div>
+
+                    <div class="skeleton h-4 rounded w-1/2"></div>
+
+                    <div class="skeleton h-4 rounded w-5/6"></div>
+
+                    <div class="skeleton h-32 rounded mt-6"></div>
+
+                </div>
+
+            `;
+
+            
+
             simulateProgress();
 
-            try {
-                const response = await fetch('/analyze', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({ url, type: 'channel' })
-                });
-                const data = await response.json();
-                document.getElementById('resultArea').innerHTML = marked.parse(data.result);
-                
-                const vScore = data.result.match(/Viral Score\s*\|\s*([\d/]+)/);
-                const hCat = data.result.match(/Товарная ниша\s*\|\s*([^|\n]+)/);
-                const eng = data.result.match(/Средняя вовлеченность\s*\|\s*([\d.]+)%/);
-                const pc = data.result.match(/Постов проанализировано\s*\|\s*(\d+)/);
-
-                if(vScore) document.getElementById('viralScore').textContent = vScore[1];
-                if(hCat) document.getElementById('hotCategory').textContent = hCat[1];
-                if(eng) document.getElementById('engagement').textContent = eng[1] + '%';
-                if(pc) document.getElementById('postsCount').textContent = pc[1];
-
-                document.getElementById('chartsSection').style.display = 'grid';
-                initCharts();
-            } catch (e) { document.getElementById('resultArea').innerHTML = 'Ошибка анализа'; }
-            finally { btn.disabled = false; document.getElementById('aiStatus').classList.add('hidden'); }
-        }
-
-        function initCharts() {
-            const ctx1 = document.getElementById('engagementChart').getContext('2d');
-            if (engagementChart) engagementChart.destroy();
-            engagementChart = new Chart(ctx1, { type: 'line', data: { labels: ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'], datasets: [{ label: 'Engagement %', data: [5, 7, 6, 9, 12, 8, 10], borderColor: '#4ade80', tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false } });
             
-            const ctx2 = document.getElementById('categoryChart').getContext('2d');
-            if (categoryChart) categoryChart.destroy();
-            categoryChart = new Chart(ctx2, { type: 'doughnut', data: { labels: ['Viral','Product','Educational'], datasets: [{ data: [60, 25, 15], backgroundColor: ['#4ade80','#60a5fa','#a78bfa'] }] }, options: { responsive: true, maintainAspectRatio: false } });
+
+            try {
+
+                const response = await fetch('/analyze', {
+
+                    method: 'POST',
+
+                    headers: {'Content-Type': 'application/json'},
+
+                    body: JSON.stringify({ url })
+
+                });
+
+                
+
+                if (!response.ok) throw new Error('Analysis error');
+
+                
+
+                const data = await response.json();
+
+                
+
+                // Render markdown result
+
+                resultArea.innerHTML = marked.parse(data.result);
+
+                
+
+                // Extract data from markdown table
+
+                const vScoreMatch = data.result.match(/Viral Score\s*\|\s*([\d/]+)/i);
+
+                const categoryMatch = data.result.match(/Товарная ниша\s*\|\s*([^|\n]+)/i);
+
+                const engagementMatch = data.result.match(/Средняя вовлеченность\s*\|\s*([\d.]+)%/i);
+
+                const postsMatch = data.result.match(/Постов проанализировано\s*\|\s*(\d+)/i);
+
+                
+
+                // Animate stats
+
+                if (vScoreMatch) {
+
+                    const score = vScoreMatch[1];
+
+                    const scoreEl = document.getElementById('viralScore');
+
+                    scoreEl.classList.add('animate-count-up');
+
+                    scoreEl.textContent = score;
+
+                    document.getElementById('viralTrend').textContent = '↗ Growing trend';
+
+                }
+
+                
+
+                if (categoryMatch) {
+
+                    document.getElementById('hotCategory').textContent = categoryMatch[1].trim();
+
+                }
+
+                
+
+                if (engagementMatch) {
+
+                    const engVal = parseFloat(engagementMatch[1]);
+
+                    const engEl = document.getElementById('engagement');
+
+                    animateValue(engEl, 0, engVal, 1000);
+
+                    setTimeout(() => {
+
+                        engEl.textContent = engVal.toFixed(1) + '%';
+
+                        document.getElementById('engagementChange').textContent = '↗ +12% this week';
+
+                    }, 1000);
+
+                }
+
+                
+
+                if (postsMatch) {
+
+                    const postsEl = document.getElementById('postsCount');
+
+                    animateValue(postsEl, 0, parseInt(postsMatch[1]), 1200);
+
+                }
+
+                
+
+                // Show charts
+
+                setTimeout(() => {
+
+                    document.getElementById('chartsSection').style.display = 'grid';
+
+                    createEngagementChart({});
+
+                    createCategoryChart({});
+
+                }, 600);
+
+                
+
+                // Show top posts
+
+                setTimeout(() => {
+
+                    createTopPosts([
+
+                        { text: 'How we increased sales by 300% in a month using this simple trick...', likes: '2.3K', comments: '456', shares: '234', date: '2 days ago' },
+
+                        { text: '10 marketing trends that will change 2025. Must read!', likes: '1.8K', comments: '312', shares: '189', date: '4 days ago' },
+
+                        { text: 'Case: launched product with $0 budget and made $50K first month', likes: '1.5K', comments: '278', shares: '156', date: '1 week ago' }
+
+                    ]);
+
+                }, 900);
+
+                
+
+                // Show export button
+
+                document.getElementById('exportBtn').classList.remove('hidden');
+
+                
+
+            } catch (error) {
+
+                resultArea.innerHTML = `
+
+                    <div class="text-center py-12">
+
+                        <svg class="w-16 h-16 mx-auto mb-4" fill="none" stroke="#C9A875" viewBox="0 0 24 24" stroke-width="1.5">
+
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+
+                        </svg>
+
+                        <p class="font-semibold" style="color: #C9A875;">❌ Analysis error</p>
+
+                        <p class="text-sm mt-2" style="color: #8B7355;">Check URL and try again</p>
+
+                    </div>
+
+                `;
+
+            } finally {
+
+                btn.disabled = false;
+
+                btn.innerHTML = '▶ RUN ANALYSIS';
+
+                aiStatus.classList.add('hidden');
+
+                progressContainer.classList.add('hidden');
+
+            }
+
         }
-    </script>
+
+        
+
+        function exportReport() {
+
+            const resultHTML = document.getElementById('resultArea').innerHTML;
+
+            const stats = {
+
+                viralScore: document.getElementById('viralScore').textContent,
+
+                category: document.getElementById('hotCategory').textContent,
+
+                engagement: document.getElementById('engagement').textContent,
+
+                posts: document.getElementById('postsCount').textContent
+
+            };
+
+            
+
+            // Create downloadable HTML report
+
+            const reportHTML = `
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>The Weit Analysis Report</title>
+
+    <style>
+
+        body { font-family: 'Inter', Arial, sans-serif; max-width: 1200px; margin: 0 auto; padding: 20px; background: #F5F1E8; color: #2C2420; }
+
+        .header { background: linear-gradient(135deg, #C9A875, #B8976A); padding: 30px; border-radius: 10px; margin-bottom: 30px; color: white; }
+
+        .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
+
+        .stat { background: white; padding: 20px; border-radius: 10px; border: 2px solid #E8E3D8; }
+
+        .content { background: white; padding: 30px; border-radius: 10px; border: 2px solid #E8E3D8; }
+
+        table { border-collapse: collapse; width: 100%; margin: 20px 0; background: white; }
+
+        th, td { border: 1px solid #E8E3D8; padding: 12px; text-align: left; }
+
+        th { background: linear-gradient(135deg, #C9A875, #B8976A); color: white; }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="header">
+
+        <h1>THE WEIT Analysis Report</h1>
+
+        <p>Generated: ${new Date().toLocaleString('ru-RU')}</p>
+
+    </div>
+
+    <div class="stats">
+
+        <div class="stat"><h3>Viral Score</h3><h1>${stats.viralScore}</h1></div>
+
+        <div class="stat"><h3>Category</h3><h2>${stats.category}</h2></div>
+
+        <div class="stat"><h3>Engagement</h3><h1>${stats.engagement}</h1></div>
+
+        <div class="stat"><h3>Posts</h3><h1>${stats.posts}</h1></div>
+
+    </div>
+
+    <div class="content">${resultHTML}</div>
+
 </body>
+
 </html>
+
+            `;
+
+            
+
+            const blob = new Blob([reportHTML], { type: 'text/html' });
+
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+
+            a.href = url;
+
+            a.download = `weit-report-${Date.now()}.html`;
+
+            a.click();
+
+            URL.revokeObjectURL(url);
+
+        }
+
+        
+
+        // Allow Enter key to trigger analysis
+
+        document.getElementById('urlInput').addEventListener('keypress', (e) => {
+
+            if (e.key === 'Enter') analyze();
+
+        });
+
+    </script>
+
+</body>
+
+</html>]
+
