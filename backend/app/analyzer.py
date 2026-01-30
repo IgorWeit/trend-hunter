@@ -9,37 +9,26 @@ def analyze_trend(data):
     
     try:
         genai.configure(api_key=api_key)
-        all_models = [m for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
         
-        # СТРОГИЙ ПРИОРИТЕТ: 1.5-flash — наш спаситель (1500 запросов в день)
-        # Мы убираем 2.0 и 2.5, так как они блокируют работу на Free Tier
+        # ТОЧНЫЙ ПРИОРИТЕТ на основе твоего списка ID
+        # Ставим самые "лимитно-выгодные" модели на первые места
         priority_order = [
-            'models/gemini-1.5-flash',    # Самая высокая квота
-            'models/gemini-1.5-flash-8b', 
-            'models/gemini-1.5-pro',      # 50 запросов в день
-            'models/gemini-1.0-pro',      # Старая, но надежная
+            'models/gemini-flash-latest',       # Самая стабильная и выносливая
+            'models/gemini-2.5-flash-lite',     # Новая Lite с огромными квотами
+            'models/gemini-2.0-flash-lite',     # Вторая Lite
+            'models/gemini-pro-latest',        # Стабильная Pro
+            'models/gemini-3-flash-preview'     # Экспериментальное 3-е поколение
         ]
         
-        available_models = []
-        model_names_in_system = [m.name for m in all_models]
-
-        for priority in priority_order:
-            if priority in model_names_in_system:
-                available_models.append(priority)
-
-        if not available_models:
-            # Если точных совпадений нет, берем любую, кроме 2.5
-            available_models = [m.name for m in all_models if '2.5' not in m.name]
-
         last_error = None
-        
-        for model_name in available_models:
+        for model_id in priority_order:
             try:
-                print(f"✅ The Weit запускает: {model_name}")
-                model = genai.GenerativeModel(model_name=model_name)
+                print(f"✅ The Weit Intelligence запускает: {model_id}")
+                model = genai.GenerativeModel(model_name=model_id)
                 
                 prompt = f"""
-Ты — аналитическая станция The Weit. Проанализируй данные: {data}
+Ты — аналитическая станция The Weit.
+Проанализируй данные: {data}
 
 ОБЯЗАТЕЛЬНО ВКЛЮЧИ ЭТУ ТАБЛИЦУ В НАЧАЛО:
 | Показатель | Значение |
@@ -49,30 +38,27 @@ def analyze_trend(data):
 | Средняя вовлеченность | [0.0]% |
 | Постов проанализировано | 50 |
 
-### 🎬 РАЗБОР СТРАТЕГИИ
-**Сюжет:** [Анализ]
-**Ключевой фактор успеха:** [Что сработало]
-**Вывод:** [Рекомендация]
-
 ---APPLIED_MATERIAL---
-Анализ выполнен моделью {model_name}.
+Анализ выполнен через узел {model_id}.
 """
                 response = model.generate_content(prompt)
                 if response and response.text:
+                    print(f"🎯 Успех! Модель {model_id} сработала.")
                     return response.text
                 
             except Exception as e:
                 error_msg = str(e)
                 last_error = error_msg
-                
-                if "quota" in error_msg.lower() or "429" in error_msg:
-                    print(f"⚠️ Модель {model_name} перегружена. Ждем 15 сек...")
-                    time.sleep(15)
-                    continue  
+                # Если видим 429 (лимит), ждем немного и пробуем следующую
+                if "429" in error_msg or "quota" in error_msg.lower():
+                    print(f"⚠️ {model_id} исчерпала минутный лимит. Пробуем следующую...")
+                    time.sleep(2) # Небольшая пауза, чтобы не злить API
+                    continue
                 else:
+                    print(f"❌ Ошибка в {model_id}: {error_msg}")
                     continue
         
-        return f"⚠️ Все рабочие модели (1.5 Flash/Pro) временно недоступны. Ошибка: {last_error}"
+        return f"⚠️ Все доступные модели перегружены. Попробуйте через 1 минуту. (Ошибка: {last_error})"
         
     except Exception as e:
-        return f"❌ Ошибка инициализации: {str(e)}"
+        return f"❌ Критическая ошибка API: {str(e)}"
