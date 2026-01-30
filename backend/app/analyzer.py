@@ -1,45 +1,57 @@
 import os
 import google.generativeai as genai
 
-def get_best_available_model():
-    try:
-        available_models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
-        priority = ['models/gemini-1.5-flash', 'models/gemini-1.5-flash-latest', 'models/gemini-1.5-pro']
-        for m in priority:
-            if m in available_models: return m
-        return available_models[0] if available_models else None
-    except:
-        return "models/gemini-1.5-flash"
-
 def analyze_trend(data):
     api_key = os.environ.get("GOOGLE_API_KEY")
-    if not api_key: return "ОШИБКА: API ключ не найден."
+    if not api_key: 
+        return "ОШИБКА: API ключ не найден."
 
     try:
         genai.configure(api_key=api_key)
-        selected_model = get_best_available_model()
+        
+        # Фиксируем одну самую стабильную модель
+        model_name = 'gemini-1.5-flash'
+        
+        # Используем самый простой и надёжный способ подключения поиска
+        # API само поймет этот строковый идентификатор
+        model = genai.GenerativeModel(
+            model_name=model_name,
+            tools=['google_search'] 
+        )
+        
+        prompt = f"""
+        Ты — аналитическая станция The Weit.
+        Проведи поиск и глубокий анализ по запросу: "{data}"
+        
+        1. Найди 50 реальных источников (видео YouTube и тренды).
+        2. Сделай анализ драматургии и сюжета ТОЛЬКО на основе найденных ссылок.
+        
+        ФОРМАТ ОТЧЕТА:
+        ### 📊 ТАБЛИЦА МЕТРИК
+        | Metric | Value | Comparison |
+        | :--- | :--- | :--- |
+        | Viral Score | [0-10] | [Оценка] |
+        | Product Niche | [Ниша] | [Тренд] |
+        | Engagement | [0.0]% | [Vs 5.2%] |
+        | Data Sources | 50 | [Verified] |
 
-        # ПОПЫТКА 1: Новый формат (google_search)
-        try:
-            model = genai.GenerativeModel(
-                model_name=selected_model,
-                tools=[{'google_search': {}}]
-            )
-            response = model.generate_content(f"Найди 50 видео и проанализируй: {data}")
-        except Exception:
-            # ПОПЫТКА 2: Классический формат (google_search_retrieval)
-            try:
-                model = genai.GenerativeModel(
-                    model_name=selected_model,
-                    tools=[{'google_search_retrieval': {'dynamic_retrieval_config': {'dynamic_threshold': 0.3}}}]
-                )
-                response = model.generate_content(f"Найди 50 видео и проанализируй: {data}")
-            except Exception:
-                # ПОПЫТКА 3: Строковый формат (самый простой)
-                model = genai.GenerativeModel(model_name=selected_model, tools=['google_search_retrieval'])
-                response = model.generate_content(f"Найди 50 видео и проанализируй: {data}")
+        ### 🎬 РАЗБОР СТРАТЕГИИ
+        **Сюжет:** ...
+        **Смысловая нагрузка:** ...
+        **Драматургия:** (анализ зацепок и удержания)
+        **Видеоряд:** ...
+        **Озвучка:** ...
+        **Ключевой фактор успеха:** ...
+        **Вывод:** ...
 
+        ---APPLIED_MATERIAL---
+        **РЕАЛЬНЫЕ ИСТОЧНИКИ АНАЛИЗА:**
+        (Выведи список из 5-10 реальных URL-адресов YouTube, найденных тобой в поиске)
+        """
+        
+        response = model.generate_content(prompt)
         return response.text
 
     except Exception as e:
-        return f"Критическая ошибка (Grounding Fail): {str(e)}. Пожалуйста, проверьте логи Render."
+        # Если даже это не сработает, выводим чистую ошибку без обёрток
+        return f"Ошибка API: {str(e)}"
