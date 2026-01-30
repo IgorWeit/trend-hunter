@@ -1,22 +1,19 @@
 import os
 import google.generativeai as genai
+from google.generativeai import types
 
 def get_best_available_model():
-    """Находит лучшую доступную модель для твоего ключа"""
+    """Автоматически находит лучшую доступную модель"""
     try:
         available_models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
-        
-        # Приоритетный список моделей
         priority_list = [
             'models/gemini-1.5-flash',
             'models/gemini-1.5-flash-latest',
             'models/gemini-1.5-pro'
         ]
-        
         for model_name in priority_list:
             if model_name in available_models:
                 return model_name
-        
         return available_models[0] if available_models else None
     except Exception:
         return None
@@ -27,14 +24,14 @@ def analyze_trend(data):
 
     try:
         genai.configure(api_key=api_key)
-        
-        # Выбираем модель
         selected_model = get_best_available_model()
+        
         if not selected_model:
             return "ОШИБКА: Доступные модели не найдены."
 
-        # ИСПРАВЛЕНИЕ: Используем 'google_search' вместо 'google_search_retrieval'
-        tools = [{"google_search": {}}]
+        # Используем жесткую типизацию Tool для поиска
+        # Это исключает ошибку "Unknown field for FunctionDeclaration"
+        tools = [types.Tool(google_search=types.GoogleSearch())]
         
         model = genai.GenerativeModel(
             model_name=selected_model,
@@ -42,14 +39,14 @@ def analyze_trend(data):
         )
         
         prompt = f"""
-        Ты — аналитическая станция The Weit. Проведи глубокий анализ тренда: "{data}"
+        Ты — аналитическая станция The Weit. Твой запрос: "{data}"
         
         ЗАДАЧА:
-        1. Используй Google Search для поиска 50 реальных источников (видео и тренды).
-        2. Проанализируй данные, отсеивая шум.
-        3. Выполни выводы ТОЛЬКО на основе найденной информации.
+        1. Используй Google Search для поиска 50 реальных роликов и трендов.
+        2. Сформируй анализ на базе ТОЛЬКО найденных данных.
+        3. Выведи ссылки на YouTube в конце.
 
-        ОТЧЕТ:
+        ФОРМАТ ОТЧЕТА:
         ### 📊 ТАБЛИЦА МЕТРИК
         | Metric | Value | Comparison |
         | :--- | :--- | :--- |
@@ -76,4 +73,4 @@ def analyze_trend(data):
         return response.text
 
     except Exception as e:
-        return f"Ошибка API (400/Tool): {str(e)}"
+        return f"Критический сбой API (Grounding): {str(e)}"
