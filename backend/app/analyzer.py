@@ -1,22 +1,15 @@
 import os
 import google.generativeai as genai
-from google.generativeai import types
 
 def get_best_available_model():
-    """Автоматически находит лучшую доступную модель"""
     try:
         available_models = [m.name for m in genai.list_models() if 'generateContent' in m.supported_generation_methods]
-        priority_list = [
-            'models/gemini-1.5-flash',
-            'models/gemini-1.5-flash-latest',
-            'models/gemini-1.5-pro'
-        ]
-        for model_name in priority_list:
-            if model_name in available_models:
-                return model_name
+        priority = ['models/gemini-1.5-flash', 'models/gemini-1.5-flash-latest', 'models/gemini-1.5-pro']
+        for m in priority:
+            if m in available_models: return m
         return available_models[0] if available_models else None
-    except Exception:
-        return None
+    except:
+        return "models/gemini-1.5-flash"
 
 def analyze_trend(data):
     api_key = os.environ.get("GOOGLE_API_KEY")
@@ -25,52 +18,28 @@ def analyze_trend(data):
     try:
         genai.configure(api_key=api_key)
         selected_model = get_best_available_model()
-        
-        if not selected_model:
-            return "ОШИБКА: Доступные модели не найдены."
 
-        # Используем жесткую типизацию Tool для поиска
-        # Это исключает ошибку "Unknown field for FunctionDeclaration"
-        tools = [types.Tool(google_search=types.GoogleSearch())]
-        
-        model = genai.GenerativeModel(
-            model_name=selected_model,
-            tools=tools
-        )
-        
-        prompt = f"""
-        Ты — аналитическая станция The Weit. Твой запрос: "{data}"
-        
-        ЗАДАЧА:
-        1. Используй Google Search для поиска 50 реальных роликов и трендов.
-        2. Сформируй анализ на базе ТОЛЬКО найденных данных.
-        3. Выведи ссылки на YouTube в конце.
+        # ПОПЫТКА 1: Новый формат (google_search)
+        try:
+            model = genai.GenerativeModel(
+                model_name=selected_model,
+                tools=[{'google_search': {}}]
+            )
+            response = model.generate_content(f"Найди 50 видео и проанализируй: {data}")
+        except Exception:
+            # ПОПЫТКА 2: Классический формат (google_search_retrieval)
+            try:
+                model = genai.GenerativeModel(
+                    model_name=selected_model,
+                    tools=[{'google_search_retrieval': {'dynamic_retrieval_config': {'dynamic_threshold': 0.3}}}]
+                )
+                response = model.generate_content(f"Найди 50 видео и проанализируй: {data}")
+            except Exception:
+                # ПОПЫТКА 3: Строковый формат (самый простой)
+                model = genai.GenerativeModel(model_name=selected_model, tools=['google_search_retrieval'])
+                response = model.generate_content(f"Найди 50 видео и проанализируй: {data}")
 
-        ФОРМАТ ОТЧЕТА:
-        ### 📊 ТАБЛИЦА МЕТРИК
-        | Metric | Value | Comparison |
-        | :--- | :--- | :--- |
-        | Viral Score | [0-10] | [Оценка] |
-        | Product Niche | [Ниша] | [Тренд] |
-        | Engagement | [0.0]% | [Vs 5.2%] |
-        | Data Sources | 50 | [Verified] |
-
-        ### 🎬 РАЗБОР СТРАТЕГИИ
-        **Сюжет:** ...
-        **Смысловая нагрузка:** ...
-        **Драматургия:** ...
-        **Видеоряд:** ...
-        **Озвучка:** ...
-        **Ключевой фактор успеха:** ...
-        **Вывод:** ...
-
-        ---APPLIED_MATERIAL---
-        **РЕАЛЬНЫЕ ИСТОЧНИКИ АНАЛИЗА:**
-        (Выведи список из 5-10 реальных URL-адресов YouTube, найденных поиском)
-        """
-        
-        response = model.generate_content(prompt)
         return response.text
 
     except Exception as e:
-        return f"Критический сбой API (Grounding): {str(e)}"
+        return f"Критическая ошибка (Grounding Fail): {str(e)}. Пожалуйста, проверьте логи Render."
